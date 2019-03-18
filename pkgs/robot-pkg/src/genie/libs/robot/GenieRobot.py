@@ -427,6 +427,10 @@ class GenieRobot(object):
                 # then count the number of interface
                 ops = self.genie_ops_on_device_alias('interface', device, alias)
                 rs = [R(['info', '(?P<interface>.*)', 'oper_status', 'up'])]
+        elif protocol == 'pim':
+            ops = self.genie_ops_on_device_alias('pim', device, alias)
+            rs = [R(['info', 'vrf', 'default', 'interfaces', '(?P<interface>.*)', 'address_family',
+                     'ipv4', 'neighbors', '(?P<neighbor>.*)'])]
 
         count = len(find([ops], *rs, filter_=False, all_keys=True))
         if count != int(number):
@@ -790,6 +794,31 @@ class GenieRobot(object):
                                                            VerificationdatafileLoader)
         self.pts_datafile = self.testscript._load(pts_datafile,
                                                   PtsdatafileLoader)
+
+    @keyword('verify vpc status on device "${device:[^"]+}"')
+    def verify_vpc_status(self, device):
+        return self.verify_vpc_status_alias(device)
+
+    @keyword('verify vpc status'
+             'on device "${device:[^"]+}" using alias "${alias:[^"]+}"')
+    def verify_vpc_status_alias(self, device, alias=None):
+
+
+        ops = self.genie_ops_on_device_alias('vpc', device, alias)
+
+        params = ['vpc-peer-status', 'vpc-peer-keepalive-status', 'vpc-per-vlan-peer-consistency',
+                  'vpc-peer-consistency-status', 'vpc-type-2-consistency-status']
+
+        if hasattr(ops, 'info') and 'vpc' in ops.info.keys():
+            error_message = ""
+            for param in params:
+                if ops.info['vpc'][param] != 'success':
+                    error_message += '\t{} is failed.\n'.format(param)
+
+            if error_message:
+                self.builtin.fail("vPC domain isn't formed because:\n" + error_message)
+        else:
+            self.builtin.fail("Unable to retrieve vPC domain configuration.")
 
 
 class Testscript(object):
