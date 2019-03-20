@@ -806,8 +806,10 @@ class GenieRobot(object):
 
         ops = self.genie_ops_on_device_alias('vpc', device, alias)
 
-        params = ['vpc-peer-status', 'vpc-peer-keepalive-status', 'vpc-per-vlan-peer-consistency',
-                  'vpc-peer-consistency-status', 'vpc-type-2-consistency-status']
+        # params = ['vpc-peer-status', 'vpc-peer-keepalive-status', 'vpc-per-vlan-peer-consistency',
+        #           'vpc-peer-consistency-status', 'vpc-type-2-consistency-status']
+
+        params = ['vpc-peer-status', 'vpc-peer-keepalive-status']
 
         if hasattr(ops, 'info') and 'vpc' in ops.info.keys():
             error_message = ""
