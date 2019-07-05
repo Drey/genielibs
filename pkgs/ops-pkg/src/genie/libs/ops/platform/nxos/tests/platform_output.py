@@ -22,10 +22,10 @@ class PlatformOutput(object):
                          'bios_compile_time': '05/29/2013',
                          'kickstart': 'version 8.1(1) [build 8.1(0.129)] [gdb]',
                          'kickstart_compile_time': '4/30/2017 23:00:00 [04/15/2017 ''04:34:05]',
-                         'kickstart_image_file': 'slot0:///n7000-s2-kickstart.8.1.0.129.gbin',
-                         'system': 'version 8.1(1) [build 8.1(0.129)] [gdb]',
+                         'kickstart_image_file': 'slot0:///n7000-s2-kickstart.10.81.0.129.gbin',
+                         'system_version': 'version 8.1(1) [build 8.1(0.129)] [gdb]',
                          'system_compile_time': '4/30/2017 23:00:00 [04/15/2017 ''06:43:41]',
-                         'system_image_file': 'slot0:///n7000-s2-dk9.8.1.0.129.gbin'}
+                         'system_image_file': 'slot0:///n7000-s2-dk10.34.1.0.129.gbin'}
                       }
                     }
 
@@ -78,12 +78,12 @@ class PlatformOutput(object):
 
     showInstallActive = {'boot_images':
                               {'kickstart_image': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin',
-                               'system_image': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin'},
+                               'system_image': 'slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin'},
                             'active_packages':
                               {'active_package_module_0':
-                                {'active_package_name': 'n7700-s2-dk9.7.2.0.D1.1.CSCuo7721.bin'},
+                                {'active_package_name': 'n7700-s2-dk10.1.2.0.D1.1.CSCuo7721.bin'},
                                'active_package_module_3': 
-                                {'active_package_name': 'n7700-s2-dk9.7.2.0.D1.1.CSCuo7721.bin'}
+                                {'active_package_name': 'n7700-s2-dk10.1.2.0.D1.1.CSCuo7721.bin'}
                               }
                             }
 
@@ -120,11 +120,11 @@ class PlatformOutput(object):
                     {'sup_number':
                         {'sup-1':
                             {'kickstart_variable': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin',
-                             'system_variable': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin',
+                             'system_variable': 'slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin',
                              'boot_poap':'Disabled'},
                          'sup-2':
                             {'kickstart_variable': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin',
-                             'system_variable': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin',
+                             'system_variable': 'slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin',
                              'boot_poap':'Disabled'}
                         }
                     },
@@ -132,11 +132,11 @@ class PlatformOutput(object):
                     {'sup_number':
                         {'sup-1':
                             {'kickstart_variable': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin',
-                             'system_variable': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin',
+                             'system_variable': 'slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin',
                              'boot_poap':'Disabled'},
                          'sup-2':
                             {'kickstart_variable': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin',
-                             'system_variable': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin',
+                             'system_variable': 'slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin',
                              'boot_poap':'Disabled'}
                         }
                     }
@@ -295,7 +295,7 @@ class PlatformOutput(object):
                         {'size': '24576', 'date': 'Apr 21 2017', 'time': '04:18:28'},
                      'lost+found/': 
                         {'size': '4096', 'date': 'Nov 23 2016', 'time': '08:25:40'},
-                     'n7000-s2-debug-sh.8.1.0.125.gbin': 
+                     'n7000-s2-debug-sh.10.81.0.125.gbin': 
                         {'size': '4073830', 'date': 'Apr 20 2017', 'time': '10:19:08'},
                      'virtual-instance-stby-sync/': 
                         {'size': '4096', 'date': 'Apr 20 2017', 'time': '10:28:55'}
@@ -423,24 +423,110 @@ class PlatformOutput(object):
                                 }
                             }
 
-    slot = {'oc': 
-            {'33': 
-                {'sn': 'DTM171300QB', 'name': 'Nexus7000 C7009 (9 Slot) Chassis Power Supply'}, 
-             '35': 
-                {'sn': 'JAF1702AEBE', 'name': 'Nexus7000 C7009 (9 Slot) Chassis Fan Module'}}, 
-           'lc': 
-            {'3': 
-                {'state': 'ok', 'sn': 'JAF1717AAND', 'name': '1/10 Gbps Ethernet Module'}, 
-             '4': 
-                {'state': 'ok', 'sn': 'JAE18120FLU', 'name': '10/40 Gbps Ethernet Module'}}, 
-           'rp': 
-            {'2': 
-                {'rp_kickstart_boot_image': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin', 'rp_boot_image': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin', 'sn': 'JAF1708AGQH', 'name': 'N7K-SUP2', 'rp_uptime': 28650, 'redundancy_state': 'ha-standby', 'state': 'ha-standby'}, 
-             '1': 
-                {'rp_kickstart_boot_image': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin', 'rp_boot_image': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin', 'sn': 'JAF1708AGTH', 'name': 'N7K-SUP2', 'rp_uptime': 28650, 'redundancy_state': 'active', 'state': 'active'}
-            }
-        }
-
+    slot = {
+       "oc": {
+          "1": {
+             "ports": "0",
+             "module_type": "Fabric Module 2",
+             "model": "N7K-C7009-FAB-2",
+             "status": "ok",
+             "software": "NA",
+             "hardware": "3.1",
+             "mac_address": "NA",
+             "serial_number": "JAF1705AEEF",
+             "state": "ok",
+             "name": "Fabric Module 2"
+          },
+          "2": {
+             "ports": "0",
+             "module_type": "Fabric Module 2",
+             "model": "N7K-C7009-FAB-2",
+             "status": "ok",
+             "software": "NA",
+             "hardware": "3.1",
+             "mac_address": "NA",
+             "serial_number": "JAF1705BFBM",
+             "state": "ok",
+             "name": "Fabric Module 2"
+          },
+          "3": {
+             "ports": "0",
+             "module_type": "Fabric Module 2",
+             "model": "N7K-C7009-FAB-2",
+             "status": "ok",
+             "software": "NA",
+             "hardware": "3.1",
+             "mac_address": "NA",
+             "serial_number": "JAF1705AELK",
+             "state": "ok",
+             "name": "Fabric Module 2"
+          },
+          "4": {
+             "ports": "0",
+             "module_type": "Fabric Module 2",
+             "model": "N7K-C7009-FAB-2",
+             "status": "ok",
+             "software": "NA",
+             "hardware": "3.1",
+             "mac_address": "NA",
+             "serial_number": "JAF1705BFCF",
+             "state": "ok",
+             "name": "Fabric Module 2"
+          },
+          "5": {
+             "ports": "0",
+             "module_type": "Fabric Module 2",
+             "model": "N7K-C7009-FAB-2",
+             "status": "ok",
+             "software": "NA",
+             "hardware": "3.1",
+             "mac_address": "NA",
+             "serial_number": "JAF1704APQH",
+             "state": "ok",
+             "name": "Fabric Module 2"
+          },
+          "35": {
+             "name": "Nexus7000 C7009 (9 Slot) Chassis Fan Module",
+             "sn": "JAF1702AEBE"
+          },
+          "33": {
+             "name": "Nexus7000 C7009 (9 Slot) Chassis Power Supply",
+             "sn": "DTM171300QB"
+          }
+       },
+       "rp": {
+          "2": {
+             "name": "N7K-SUP2",
+             "state": "ha-standby",
+             "sn": "JAF1708AGQH",
+             "redundancy_state": "ha-standby",
+             "rp_boot_image": "slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin",
+             "rp_kickstart_boot_image": "slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin",
+             "rp_uptime": 28650
+          },
+          "1": {
+             "name": "N7K-SUP2",
+             "state": "active",
+             "sn": "JAF1708AGTH",
+             "redundancy_state": "active",
+             "rp_boot_image": "slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin",
+             "rp_kickstart_boot_image": "slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin",
+             "rp_uptime": 28650
+          }
+       },
+       "lc": {
+          "4": {
+             "name": "10/40 Gbps Ethernet Module",
+             "sn": "JAE18120FLU",
+             "state": "ok"
+          },
+          "3": {
+             "name": "1/10 Gbps Ethernet Module",
+             "sn": "JAF1717AAND",
+             "state": "ok"
+          }
+       }
+    }
     virtual_device = {'2': 
                         {'vd_name': 'PE2', 'membership': {'Eth4/4': {'status': 'OK', 'type': 'Ethernet'}, 'Eth4/3': {'status': 'OK', 'type': 'Ethernet'}}, 'vd_status': 'active'}, 
                       '3': 
@@ -463,9 +549,9 @@ class PlatformOutput(object):
                      'disk_free_space': '1674481664',
                      'disk_total_space': '1782931456',
                      'disk_used_space': '108449792',
-                     'image': 'slot0:///n7000-s2-dk9.8.1.0.129.gbin',
-                     'installed_packages': 'n7700-s2-dk9.7.2.0.D1.1.CSCuo7721.bin',
-                     'kickstart_image': 'slot0:///n7000-s2-kickstart.8.1.0.129.gbin',
+                     'image': 'slot0:///n7000-s2-dk10.34.1.0.129.gbin',
+                     'installed_packages': 'n7700-s2-dk10.1.2.0.D1.1.CSCuo7721.bin',
+                     'kickstart_image': 'slot0:///n7000-s2-kickstart.10.81.0.129.gbin',
                      'kickstart_version': 'version 8.1(1) [build 8.1(0.129)] [gdb]',
                      'main_mem': '32938744',
                      # 'maker': <genie.ops.base.maker.Maker object at 0xf712414c>,
@@ -486,14 +572,14 @@ class PlatformOutput(object):
                                             'sn': 'JAF1702AEBE'}},
                               'rp': {'1': {'name': 'N7K-SUP2',
                                            'redundancy_state': 'active',
-                                           'rp_boot_image': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin',
+                                           'rp_boot_image': 'slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin',
                                            'rp_kickstart_boot_image': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin',
                                            'rp_uptime': 28650,
                                            'sn': 'JAF1708AGTH',
                                            'state': 'active'},
                                      '2': {'name': 'N7K-SUP2',
                                            'redundancy_state': 'ha-standby',
-                                           'rp_boot_image': 'slot0:/n7000-s2-dk9.8.3.0.CV.0.658.gbin',
+                                           'rp_boot_image': 'slot0:/n7000-s2-dk10.34.3.0.CV.0.658.gbin',
                                            'rp_kickstart_boot_image': 'slot0:/n7000-s2-kickstart.8.3.0.CV.0.658.gbin',
                                            'rp_uptime': 28650,
                                            'sn': 'JAF1708AGQH',

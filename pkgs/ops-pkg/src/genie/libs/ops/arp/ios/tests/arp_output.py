@@ -27,9 +27,9 @@ class ArpOutput(object):
 			'Port-channel10': {
 				'ipv4': {
 					'neighbors': {
-						'1.2.1.1': {
+						'10.9.1.1': {
 							'age': '-',
-							'ip': '1.2.1.1',
+							'ip': '10.9.1.1',
 							'link_layer_address': '843d.c638.b9c6',
 							'origin': 'static',
 							'protocol': 'Internet',
@@ -37,9 +37,9 @@ class ArpOutput(object):
 			'Vlan99': {
 				'ipv4': {
 					'neighbors': {
-						'18.0.1.2': {
+						'10.69.1.2': {
 							'age': '-',
-							'ip': '18.0.1.2',
+							'ip': '10.69.1.2',
 							'link_layer_address': '843d.c638.b9c1',
 							'origin': 'static',
 							'protocol': 'Internet',
@@ -49,7 +49,53 @@ class ArpOutput(object):
 			}
 		}
 	}
-
+	ShowIpArpVrf = {
+		'interfaces': {
+			'GigabitEthernet2.390': {
+				'ipv4': {
+					'neighbors': {
+						'10.12.90.1': {
+							'age': '-',
+							'ip': '10.12.90.1',
+							'link_layer_address': 'fa16.3e24.787a',
+							'origin': 'static',
+							'protocol': 'Internet',
+							'type': 'ARPA'},
+						'10.12.90.2':
+							{'age': '139',
+							 'ip': '10.12.90.2',
+							 'link_layer_address': 'fa16.3e8a.cfeb',
+							 'origin': 'dynamic',
+							 'protocol': 'Internet',
+							 'type': 'ARPA'}
+					}
+				}
+			},
+			'GigabitEthernet2.410': {
+				'ipv4': {
+					'neighbors': {
+						'10.12.110.1': {
+							'age': '-',
+							'ip': '10.12.110.1',
+							'link_layer_address': 'fa16.3e24.787a',
+							'origin': 'static',
+							'protocol': 'Internet',
+							'type': 'ARPA'}
+					}
+				}
+			}
+		}
+	}
+	ShowVrf = {
+		'vrf': {
+			'VRF1': {
+				'route_distinguisher': '65000:1',
+				'protocols': ['ipv4', 'ipv6'],
+				'interfaces': ['GigabitEthernet2.390',
+							   'GigabitEthernet2.410'],
+			}
+		}
+	}
 	ShowIpArpSummary = {
 		'incomp_entries': 0,
 		'total_entries': 8}
@@ -231,9 +277,9 @@ class ArpOutput(object):
 				"unreachables": "always sent",
 			},
 			"ipv4": {
-				"201.11.14.1/24": {
+				"192.168.76.1/24": {
 					"prefix_length": "24",
-					"ip": "201.11.14.1",
+					"ip": "192.168.76.1",
 					"secondary": False,
 					"broadcase_address": "255.255.255.255"
 				}
@@ -407,8 +453,8 @@ class ArpOutput(object):
             'Port-channel10': {
             	'ipv4': {
             		'neighbors': {
-            			'1.2.1.1': {
-            				'ip': '1.2.1.1',
+            			'10.9.1.1': {
+            				'ip': '10.9.1.1',
                           	'link_layer_address': '843d.c638.b9c6',
                           	'origin': 'static'}
                     }
@@ -422,13 +468,41 @@ class ArpOutput(object):
             'Vlan99': {
             	'ipv4': {
             		'neighbors': {
-            			'18.0.1.2': {
-            				'ip': '18.0.1.2',
+            			'10.69.1.2': {
+            				'ip': '10.69.1.2',
                            	'link_layer_address': '843d.c638.b9c1',
                            	'origin': 'static'}
                     }
                 }
-            }
+            },
+			'GigabitEthernet2.390': {
+				'ipv4': {
+					'neighbors': {
+						'10.12.90.1': {
+							'ip': '10.12.90.1',
+							'link_layer_address': 'fa16.3e24.787a',
+							'origin': 'static',
+						},
+						'10.12.90.2':
+							{
+								'ip': '10.12.90.2',
+								'link_layer_address': 'fa16.3e8a.cfeb',
+								'origin': 'dynamic',
+							}
+					}
+				}
+			},
+			'GigabitEthernet2.410': {
+				'ipv4': {
+					'neighbors': {
+						'10.12.110.1': {
+							'ip': '10.12.110.1',
+							'link_layer_address': 'fa16.3e24.787a',
+							'origin': 'static',
+						}
+					}
+				}
+			},
         },
  		'statistics': {'entries_total': 8,
                 'in_drops': 0,

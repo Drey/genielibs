@@ -70,7 +70,7 @@ class HA(object):
             
         self._reconnect(steps=steps, timeout=timeout)
 
-    def reload(self, steps, timeout):
+    def reload(self, steps, timeout, reload_timeout, config_lock_retry_sleep, config_lock_retries):
         """Do the reload the whole box action and
         reconnect to router after reload.
 
@@ -116,8 +116,13 @@ class HA(object):
             # TODO - update more with issues when seeing
             # update the error pattern
             self.device.settings.ERROR_PATTERN.append("Write failed: Broken pipe")
+            
             try:
-                self.device.reload(dialog=dialog)
+                self.device.reload(dialog=dialog, 
+                                   timeout=reload_timeout,
+                                   config_lock_retry_sleep=config_lock_retry_sleep,
+                                   config_lock_retries=config_lock_retries)
+                
             except SubCommandFailure:
                 # read the capture setting errors
                 try:
@@ -173,6 +178,49 @@ class HA(object):
                 raise Exception(str(e))
 
         # check if reload the active supervisor LC
+        # if so, need reconnection
+        try:
+            self.device.execute('show clock')
+        except:
+            self._reconnect(steps=steps, timeout=timeout)
+
+    def reloadFabric(self, steps, timeout, fabric):
+        """
+        Args:
+          Mandatory:
+            steps (`obj`) : Step object to represent each step taken.
+            timeout (`obj`) : 
+                max_time (int): Maximum wait time for the trigger,
+                                in second. Default: 180
+                interval (int): Wait time between iterations when looping is needed,
+                                in second. Default: 15
+            fabric (`str`) : Fabric module number need to reload.
+
+        Returns:
+            AETEST Step Result
+
+
+        Raises:
+            None
+
+        Example:
+            >>> reloadFabric(steps=ats.aetest.Steps(),
+                            timeout=genie.utils.timeout.Timeout(
+                            max_time=180,
+                            interval=15),
+                            fabric = '1')
+        """
+
+        with steps.start('Reload Fabric {}'.format(fabric), continue_=True) as step:
+            try:
+                self._reloadFabric(fabric=fabric)
+                time.sleep(10)
+            except SubCommandFailure:
+                pass
+            except Exception as e:
+                raise Exception(str(e))
+
+        # check if reload the active fabric
         # if so, need reconnection
         try:
             self.device.execute('show clock')

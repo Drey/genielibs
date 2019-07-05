@@ -88,8 +88,14 @@ class GenieRobot(object):
         self.testscript.parameters['testbed'] = self.testbed
 
         # Load Genie Datafiles (Trigger, Verification and PTS)
-        self._load_genie_datafile()
 
+        # This make UUT mandatory. When learning, aka no trigger
+        # the UUT are not mandatory
+        self.loaded_yamls = True
+        self._load_genie_datafile()
+        if not self.trigger_datafile:
+            self.loaded_yamls = False
+            log.warning("Could not load the Datafile correctly")
 
     # Metaparser
     @keyword('parse "${parser:[^"]+}" on device "${device:[^"]+}"')
@@ -136,32 +142,7 @@ class GenieRobot(object):
         if alias:
             con = getattr(device_handle, alias)
 
-        # We dont know which of the python path is the package,
-        # or even if there is an abstract package. It would be easy to fix, but
-        # would need to ask for package name in Robot. It is decided to not
-        # ask, but only support genie.libs.parser.<...> for abstraction, and everything
-        # else would be just straight import 
-        package = 'genie.libs.parser'
-        if package in parser:
-            attr_name = parser.replace(package+'.', '')
-        else:
-            # then no abstraction, just load it
-            package = None
-            attr_name = parser
-
-        # Find the right library with abstraction if package is not None
-        try:
-            cls = load_attribute(package, attr_name, device=device_handle)
-        except Exception as e:
-            if package:
-                msg = "Could not find {p}.'{a}'".format(p=package, a=attr_name)
-            else:
-                msg = "Could not find '{a}'".format(a=attr_name)
-            raise Exception(msg) from e
-
-        # Instantiate the parser with the connection implementation
-        parser = cls(con)
-        return getattr(parser, context)()
+        return con.parse(parser)
 
     # Genie Ops
     @keyword('learn "${feature:[^"]+}" on device "${device:[^"]+}"')
@@ -290,6 +271,10 @@ class GenieRobot(object):
         '''Call any verification defined in the verification datafile
            on device using a specific alias with a context (cli, xml, yang, ...)
         '''
+        if not self.loaded_yamls:
+            self.builtin.fail("Could not load the yaml files - Make sure you "
+                              "have an uut device")
+
         # Set the variables to find the verification
         self.testscript.verification_uids = Or(name+'$')
         self.testscript.verification_groups = None
@@ -355,6 +340,10 @@ class GenieRobot(object):
         '''Call any trigger defined in the trigger datafile on device
         using a specific alias with a context (cli, xml, yang, ...)
         '''
+
+        if not self.loaded_yamls:
+            self.builtin.fail("Could not load the yaml files - Make sure you "
+                              "have an uut device")
 
         # Set the variables to find the trigger
         device_handle = self._search_device(device)
@@ -578,30 +567,42 @@ class GenieRobot(object):
         else:
             compare2 = self.testscript.parameters[pts_compare]
 
-        exclude_list = ['device', 'maker', 'diff_ignore', 'callables',
-                        '(Current configuration.*)']
 
-        if 'exclude' in self.pts_datafile:
-            exclude_list.extend(self.pts_datafile['exclude'])
+
+        exclude_list = ['device', 'maker', 'diff_ignore', 'callables',
+                        '(Current configuration.*)', 'ops_schema']
+
+        try:
+            if 'exclude' in self.pts_datafile:
+                exclude_list.extend(self.pts_datafile['exclude'])
+        except AttributeError:
+            pass
 
         msg = []
         for fet in compare1:
             failed = []
-            feature_exclude_list = exclude_list
+            feature_exclude_list = exclude_list.copy()
 
             # Get the information too from the pts_data
             try:
                 feature_exclude_list.extend(self.pts_datafile[fet]['exclude'])
-            except KeyError:
+            except (KeyError, AttributeError):
                 pass
 
             for dev in compare1[fet]:
                 # Only compare for the specified devices
                 if dev not in devices:
                     continue
+                dev_exclude = feature_exclude_list.copy()
+                try:
+                    dev_exclude.extend(compare1[fet][dev].exclude)
+                    # TODO - better fix,
+                    dev_exclude.remove(None)
+                except (AttributeError, ValueError):
+                    pass
 
                 diff = Diff(compare1[fet][dev], compare2[fet][dev],
-                    exclude=feature_exclude_list)
+                    exclude=dev_exclude)
 
                 diff.findDiff()
 
@@ -781,17 +782,19 @@ class GenieRobot(object):
         if '${pts_datafile}' in variables:
             pts_datafile = variables['${pts_datafile}']
 
-        trigger_datafile, verification_datafile, pts_datafile , *_ =\
+        self.trigger_datafile, self.verification_datafile, pts_datafile , *_ =\
              self.testscript._validate_datafiles(self.testbed,
                                                  trigger_datafile,
 						 verification_datafile,
 						 pts_datafile,
 						 None, None)
 
-        self.trigger_datafile = self.testscript._load(trigger_datafile,
-                                                      TriggerdatafileLoader)
-        self.verification_datafile = self.testscript._load(verification_datafile,
-                                                           VerificationdatafileLoader)
+        if self.trigger_datafile:
+            self.trigger_datafile = self.testscript._load(self.trigger_datafile,
+                                                          TriggerdatafileLoader)
+        if self.verification_datafile:
+            self.verification_datafile = self.testscript._load(self.verification_datafile,
+                                                               VerificationdatafileLoader)
         self.pts_datafile = self.testscript._load(pts_datafile,
                                                   PtsdatafileLoader)
 
@@ -821,6 +824,76 @@ class GenieRobot(object):
                 self.builtin.fail("vPC domain isn't formed because:\n" + error_message)
         else:
             self.builtin.fail("Unable to retrieve vPC domain configuration.")
+
+    @keyword('verify interface list "${interface_list:[^"]+}" status "${status:[^"]+}" on device "${device:[^"]+}"')
+    def verify_interface_list_status(self, interface_list, status, device):
+        return self.verify_interface_list_status_alias(interface_list, status, device)
+
+    @keyword('verify interface list "${interface_list:[^"]+}" status "${state:[^"]+}"'
+             'on device "${device:[^"]+}" using alias "${alias:[^"]+}"')
+    def verify_interface_list_status_alias(self, interface_list, status, device, alias=None):
+        interface_list = interface_list.split(',')
+        if not len(interface_list) > 0:
+            self.builtin.fail("Provide comma separated interface list before 'interface list' keyword.")
+
+        for interface in interface_list:
+            ops = self.genie_ops_on_device_alias('interface', device, alias)
+            rs = [R(['info', '(?P<interface>(?i){})'.format(interface), 'oper_status', '(?P<status>(?:up|down))'])]
+            result = find([ops], *rs, filter_=False, all_keys=True)
+            if not result or len(result) == 0:
+                self.builtin.fail("Unable to get information about {} status.".format(interface))
+            else:
+                if result[0][0] != status:
+                    self.builtin.fail("Interface {} is {}, but must be {}.".format(interface, result[0][0], status))
+
+    @keyword('verify evpn "${service_type:[^"]+}" service list "${service_list:[^"]+}" on device "${device:[^"]+}"')
+    def verify_evpn_service_list_status(self, service_type, service_list, device):
+        return self.verify_evpn_service_list_status_alias(service_type, service_list, device)
+
+    @keyword('verify evpn "${service_type:[^"]+}" service list "${service_list:[^"]+}"'
+             'on device "${device:[^"]+}" using alias "${alias:[^"]+}"')
+    def verify_evpn_service_list_status_alias(self, service_type, service_list, device, alias=None):
+        if not re.match('l[23]vni', service_type):
+            self.builtin.fail("{} is not supported service type. ".format(service_type) +
+                              "Only l2vni and l3vni service types are supported.")
+
+        service_list = service_list.split(',')
+        if not len(service_list) > 0:
+            self.builtin.fail("Provide comma separated VNI list before 'service list' keyword.")
+
+        # Retrieving information about VLAN to VNI mappings
+        vlan_ops = self.genie_ops_on_device_alias('vlan', device, alias)
+        vni_mappings = {}
+        for vni in service_list:
+            rs = [R(['info', 'vlans', '(?P<vlan>\d+$)', 'state', 'active']),
+                  R(['info', 'vlans', '(?P<vlan>\d+$)', 'vn_segment_id', '(?P<vni>{})'.format(vni)])]
+            result = find([vlan_ops], *rs, filter_=False)
+            if len(result) == 1:
+                vni_mappings[vni] = 'Vlan' + str(result[0][1][2])
+                continue
+            self.builtin.fail("Unable to find VLAN to VNI mapping for VNI {}.".format(vni))
+
+        # Reference to a method that should do interface status check
+        self.verify_interface_list_status_alias(','.join(vni_mappings.values()), 'up', device)
+
+        # Checking VNIs operational state
+        vxlan_parser = self.genie_ops_on_device_alias('vxlan', device, alias)
+        for vni in service_list:
+            rs = [R(['nve', 'nve1', 'vni', '(?P<vni>{})'.format(str(vni)), 'vni_state', 'up'])]
+            result = find([vxlan_parser], *rs, filter_=False, all_keys=True)
+            if len(result) > 0:
+                rs = [R(['nve', 'nve1', 'vni', '(?P<vni>{})'.format(vni), 'associated_vrf', '(?:True|False)'])]
+                result = find([vxlan_parser], *rs, filter_=False, all_keys=True)
+                associated_vrf = {'l2vni': 'false', 'l3vni': 'true'}
+                associated_vrf_current_str = str(result[0][0]).lower()
+                if len(result) > 0 and associated_vrf_current_str == associated_vrf[service_type]:
+                    continue
+                else:
+                    self.builtin.fail("VNI {} associate vrf state is {}, ".format(vni, associated_vrf_current_str),
+                                      "but must be {}".format(associated_vrf[service_type]))
+                continue
+            else:
+                self.builtin.fail("VNI {} is down.".format(vni))
 
 
 class Testscript(object):

@@ -11,6 +11,8 @@ from genie.libs.sdk.libs.utils.mapping import Mapping
 from genie.libs.sdk.triggers.shutnoshut.shutnoshut import \
                        TriggerShutNoShut as CommonShutNoShut
 
+from ats.utils.objects import NotExists
+
 log = logging.getLogger(__name__)
 
 
@@ -34,10 +36,11 @@ class TriggerShutNoShut(CommonShutNoShut):
                pyATS Results
         '''
         # shut BGP process
-        try:
-            uut.execute("process shutdown bgp")
-        except Exception as e:
-            self.failed('Failed to shut the feature', from_exception=e)
+        with steps.start("Shut Bgp process") as step:
+          try:
+              uut.execute("process shutdown bgp")
+          except Exception as e:
+              step.failed('Failed to shut the feature', from_exception=e)
 
     @aetest.test
     def unshut(self, uut, method, abstract, steps):
@@ -56,14 +59,14 @@ class TriggerShutNoShut(CommonShutNoShut):
            Raises:
                pyATS Results
         '''
-
         # unshut BGP process
         # workaround: shut bpm instead of bgp cause bgp cannot be started from sysmgr.
         # known bug: CSCtr26693
-        try:
-            uut.execute("process restart bpm")
-        except Exception as e:
-            self.failed('Failed to shut the feature', from_exception=e)
+        with steps.start("UnShut Bgp process") as step:
+          try:
+              uut.execute("process restart bpm")
+          except Exception as e:
+              step.failed('Failed to shut the feature', from_exception=e)
 
 # Trigger required data settings
 # Which key to exclude for BGP Ops comparison
@@ -116,7 +119,7 @@ class TriggerShutNoShutBgp(TriggerShutNoShut):
         1. Learn BGP Ops object and store the BGP instance(s)
            if has any, otherwise, SKIP the trigger
         2. Do "process shutdown bgp"
-        3. Verify the state of BGP instance(s) is "KILLED"
+        3. Verify the protocol state in BGP instance(s) is "KILLED"
         4. Do "process restart bpm"
         5. Learn BGP Ops again and verify it is the same as the Ops in step 1
 
@@ -130,10 +133,8 @@ class TriggerShutNoShutBgp(TriggerShutNoShut):
                                         'kwargs':{'attributes':['info']},
                                         'exclude': bgp_exclude}},
                       verify_ops={'ops.bgp.bgp.Bgp':{
-                                    'requirements': [['info', 'instance', '(?P<instance>.*)',
-                                                      'protocol_state', 'KILLED'],
-                                                     ['info', 'instance', '(?P<instance>.*)',
-                                                      '(.*)']],
+                                    'requirements': [['info', 'instance', '(?P<instance>.*)', 'protocol_state', 'KILLED'],
+                                                    ['info', 'instance', '(?P<instance>.*)', NotExists('vrf')]],
                                     'kwargs':{'attributes':['info']},
                                     'exclude': bgp_exclude}},
                       num_values={'instance':'all'})
